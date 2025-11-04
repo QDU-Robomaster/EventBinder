@@ -19,12 +19,9 @@ depends:
 === END MANIFEST === */
 // clang-format on
 
-#include <sys/_intsup.h>
 #include "DR16.hpp"
 #include "Chassis.hpp"
 #include "app_framework.hpp"
-#include "libxr_def.hpp"
-#include "thread.hpp"
 
 template <typename ChassisType, typename MotorType>
 class EventBinder : public LibXR::Application {
