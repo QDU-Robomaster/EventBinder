@@ -32,13 +32,8 @@ class EventBinder : public LibXR::Application {
     UNUSED(hw);
     UNUSED(app);
 
-    thread_.Create(this, ThreadFunction, "EventBinderThread", 1024,
-                   LibXR::Thread::Priority::LOW);
-  }
-
-  static void ThreadFunction(EventBinder<ChassisType, MotorType> *binder) {
-    auto &dr16_event_source = binder->dr16_.GetEvent();
-    auto &chassis_event_handler = binder->chassis_.GetEvent();
+    auto &dr16_event_source = dr16_.GetEvent();
+    auto &chassis_event_handler = chassis_.GetEvent();
     chassis_event_handler.Bind(
         dr16_event_source,
         static_cast<uint32_t>(DR16::SwitchPos::DR16_SW_L_POS_TOP),
