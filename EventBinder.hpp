@@ -5,7 +5,7 @@
 module_description: No description provided
 constructor_args:
   - dr16: '@dr16'
-  - chassis: '@chassis'
+  - chassis: '@omni_chassis'
 template_args:
   - ChassisType: Omni<RMMotorContainer>
   - MotorType: RMMotorContainer
@@ -32,7 +32,7 @@ class EventBinder : public LibXR::Application {
       : dr16_(dr16), chassis_(chassis) {
     UNUSED(hw);
     UNUSED(app);
-    
+
     thread_.Create(this, ThreadFunction, "EventBinderThread", 1024,
                    LibXR::Thread::Priority::LOW);
   }
