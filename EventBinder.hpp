@@ -14,6 +14,8 @@ required_hardware:
 depends:
   - qdu-future/DR16
   - qdu-future/Chassis
+  - qdu-future/Motor
+  - qdu-future/CMD
 === END MANIFEST === */
 // clang-format on
 
