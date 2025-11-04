@@ -98,9 +98,9 @@ jobs:
           xrobot_add_mod BlinkLED --instance-id BlinkLED_0
           xrobot_add_mod Motor --instance-id motor_can1
           xrobot_add_mod Motor --instance-id motor_can2
-          xrobot_add_mod Chassis  --instance-id omni_chassis
           xrobot_add_mod DR16     --instance-id dr16
           xrobot_add_mod CMD      --instance-id cmd
+          xrobot_add_mod Chassis  --instance-id omni_chassis
 
       - name: Add this repo module
         run: |
