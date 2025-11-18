@@ -19,15 +19,17 @@ depends:
 === END MANIFEST === */
 // clang-format on
 
-#include "DR16.hpp"
+#include <cstdint>
+
 #include "Chassis.hpp"
+#include "DR16.hpp"
 #include "app_framework.hpp"
 
-template <typename ChassisType, typename MotorType>
+template <typename ChassisType>
 class EventBinder : public LibXR::Application {
  public:
   EventBinder(LibXR::HardwareContainer &hw, LibXR::ApplicationManager &app,
-              DR16 &dr16, Chassis<ChassisType, MotorType> &chassis)
+              DR16 &dr16, Chassis<ChassisType> &chassis)
       : dr16_(dr16), chassis_(chassis) {
     UNUSED(hw);
     UNUSED(app);
@@ -43,6 +45,10 @@ class EventBinder : public LibXR::Application {
         dr16_event_source,
         static_cast<uint32_t>(DR16::SwitchPos::DR16_SW_L_POS_MID),
         static_cast<uint32_t>(ChassisEvent::SET_MODE_FOLLOW));
+    chassis_event_handler.Bind(
+        dr16_event_source,
+        static_cast<uint32_t>(DR16::SwitchPos::DR16_SW_L_POS_BOT),
+        static_cast<float>(ChassisEvent::SET_MODE_ROTOR));
   }
 
   void OnMonitor() override {}
@@ -50,5 +56,5 @@ class EventBinder : public LibXR::Application {
  private:
   LibXR::Thread thread_;
   DR16 &dr16_;
-  Chassis<ChassisType, MotorType> &chassis_;
+  Chassis<ChassisType> &chassis_;
 };
