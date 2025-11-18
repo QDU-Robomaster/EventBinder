@@ -7,8 +7,7 @@ constructor_args:
   - dr16: '@dr16'
   - chassis: '@omni_chassis'
 template_args:
-  - ChassisType: Omni<RMMotorContainer>
-  - MotorType: RMMotorContainer
+  - ChassisType: Omni
 required_hardware:
   - dr16
 depends:
