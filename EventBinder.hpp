@@ -53,19 +53,9 @@ depends:
 #include "DR16.hpp"
 #include "app_framework.hpp"
 
-/**
- * @brief 事件绑定器模板类
- * @details 该类用于建立不同模块间的事件绑定关系，当源模块产生特定事件时，
- *          自动触发目标模块的对应事件。支持通过构造函数参数灵活配置绑定关系。
- * @tparam ChassisType 底盘类型模板参数
- */
 template <typename ChassisType>
 class EventBinder : public LibXR::Application {
  public:
-  /**
-   * @brief 事件绑定结构体
-   * @details 定义了一个从源模块事件到目标模块事件的映射关系
-   */
   struct EventBinding {
     const char* source_module;  // 源模块名称 ("dr16", "cmd", "chassis")
     uint32_t source_event;      // 源事件ID
@@ -81,20 +71,10 @@ class EventBinder : public LibXR::Application {
           target_event(static_cast<uint32_t>(target_evt)) {}
   };
 
-  /**
-   * @brief 绑定组结构体
-   * @details 包含一组相关的事件绑定关系
-   */
   struct BindingGroup {
     std::initializer_list<EventBinding> bindings;
-    constexpr BindingGroup(std::initializer_list<EventBinding> b)
-        : bindings(b) {}
   };
 
-  /**
-   * @brief 模块信息结构体
-   * @details 存储模块名称及其事件处理器的引用
-   */
   struct ModuleInfo {
     const char* name;
     LibXR::Event* event_ptr;
@@ -106,14 +86,6 @@ class EventBinder : public LibXR::Application {
         : name(n), event_ptr(e) {}
   };
 
-  /**
-   * @brief 构造函数
-   * @details 初始化事件绑定器，建立模块间事件绑定关系
-   * @param hw 硬件容器引用
-   * @param app 应用管理器引用
-   * @param modules 模块信息列表
-   * @param event_binding_groups 事件绑定组列表
-   */
   EventBinder(LibXR::HardwareContainer& hw, LibXR::ApplicationManager& app,
               std::initializer_list<ModuleInfo> modules,
               std::initializer_list<BindingGroup> event_binding_groups) {
@@ -143,10 +115,6 @@ class EventBinder : public LibXR::Application {
     }
   }
 
-  /**
-   * @brief 监控回调函数
-   * @details 虚函数重写，当前为空实现
-   */
   void OnMonitor() override {}
 
  private:
