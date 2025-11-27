@@ -87,6 +87,8 @@ class EventBinder : public LibXR::Application {
    */
   struct BindingGroup {
     std::initializer_list<EventBinding> bindings;
+    constexpr BindingGroup(std::initializer_list<EventBinding> b)
+        : bindings(b) {}
   };
 
   /**
