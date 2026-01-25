@@ -10,10 +10,6 @@ constructor_args:
       module_ref: '@dr16'
     - name: "cmd"
       module_ref: '@cmd'
-    - name: "launcher"
-      module_ref: '@Launcher_0'
-    - name: "chassis"
-      module_ref: '@Chassis_0'
   - event_binding_groups:
     # CMD control mode switching
     - bindings:
