@@ -61,7 +61,6 @@ depends:
 #include <initializer_list>
 
 #include "CMD.hpp"
-#include "Chassis.hpp"
 #include "DR16.hpp"
 #include "app_framework.hpp"
 
