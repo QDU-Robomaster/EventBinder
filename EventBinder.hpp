@@ -10,8 +10,6 @@ constructor_args:
       module_ref: '@dr16'
     - name: "cmd"
       module_ref: '@cmd'
-    - name: "chassis"
-      module_ref: '@omni_chassis'
   - event_binding_groups:
     # CMD control mode switching
     - bindings:
@@ -22,25 +20,11 @@ constructor_args:
       - source_module: "dr16"
         source_event: DR16::SwitchPos::DR16_SW_R_POS_BOT
         target_module: "cmd"
-        target_event: CMD::Mode::CMD_AUTO_CTRL
-    # Chassis mode switching
-    - bindings:
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_L_POS_TOP
-        target_module: "chassis"
-        target_event: ChassisEvent::SET_MODE_RELAX
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_L_POS_MID
-        target_module: "chassis"
-        target_event: ChassisEvent::SET_MODE_FOLLOW
-template_args:
-  - ChassisType: Omni
+        target_event: CMD::Mode::CMD_OP_CTRL
 required_hardware:
   - dr16
 depends:
   - qdu-future/DR16
-  - qdu-future/Chassis
-  - qdu-future/RMMotor
   - qdu-future/CMD
 === END MANIFEST === */
 // clang-format on
@@ -49,11 +33,9 @@ depends:
 #include <initializer_list>
 
 #include "CMD.hpp"
-#include "Chassis.hpp"
 #include "DR16.hpp"
 #include "app_framework.hpp"
 
-template <typename ChassisType>
 class EventBinder : public LibXR::Application {
  public:
   struct EventBinding {
