@@ -25,34 +25,10 @@ constructor_args:
         source_event: DR16::SwitchPos::DR16_SW_R_POS_BOT
         target_module: "cmd"
         target_event: CMD::Mode::CMD_OP_CTRL
-    # Chassis mode switching
-    - bindings:
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_L_POS_TOP
-        target_module: "chassis"
-        target_event: ChassisEvent::SET_MODE_RELAX
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_L_POS_MID
-        target_module: "chassis"
-        target_event: ChassisEvent::SET_MODE_INDEPENDENT
-    # Launcher mode switching
-    - bindings:
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_R_POS_MID
-        target_module: "launcher"
-        target_event: DartEvent::SET_MODE_FRIC_STOP
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_R_POS_BOT
-        target_module: "launcher"
-        target_event: DartEvent::SET_MODE_FRIC_START
-template_args:
-  - ChassisType: Mecanum
 required_hardware:
   - dr16
 depends:
   - qdu-future/DR16
-  - qdu-future/Chassis
-  - qdu-future/RMMotor
   - qdu-future/CMD
 === END MANIFEST === */
 // clang-format on
