@@ -36,8 +36,15 @@ depends:
 #include "DR16.hpp"
 #include "app_framework.hpp"
 
+/**
+ * @brief 事件绑定模块
+ * @details 按配置将源模块事件转发绑定到目标模块事件，实现跨模块事件映射。
+ */
 class EventBinder : public LibXR::Application {
  public:
+  /**
+   * @brief 单条事件绑定描述
+   */
   struct EventBinding {
     const char* source_module;  // 源模块名称 ("dr16", "cmd", "chassis")
     uint32_t source_event;      // 源事件ID
@@ -57,6 +64,9 @@ class EventBinder : public LibXR::Application {
     std::initializer_list<EventBinding> bindings;
   };
 
+  /**
+   * @brief 模块事件入口描述
+   */
   struct ModuleInfo {
     const char* name;
     LibXR::Event* event_ptr;
@@ -68,6 +78,13 @@ class EventBinder : public LibXR::Application {
         : name(n), event_ptr(e) {}
   };
 
+  /**
+   * @brief 构造 EventBinder 并注册全部绑定关系
+   * @param hw 硬件容器
+   * @param app 应用管理器
+   * @param modules 可绑定的模块事件列表
+   * @param event_binding_groups 分组事件绑定配置
+   */
   EventBinder(LibXR::HardwareContainer& hw, LibXR::ApplicationManager& app,
               std::initializer_list<ModuleInfo> modules,
               std::initializer_list<BindingGroup> event_binding_groups) {
@@ -97,6 +114,9 @@ class EventBinder : public LibXR::Application {
     }
   }
 
+  /**
+   * @brief 监控回调
+   */
   void OnMonitor() override {}
 
  private:
