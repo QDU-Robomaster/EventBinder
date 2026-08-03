@@ -7,9 +7,9 @@ constructor_args:
   - modules:
     # List of modules involved in event binding
     - name: "dr16"
-      module_ref: '@dr16'
+      module_ref: '@nullptr'
     - name: "cmd"
-      module_ref: '@cmd'
+      module_ref: '@nullptr'
   - event_binding_groups:
     # CMD control mode switching
     - bindings:
