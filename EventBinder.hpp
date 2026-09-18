@@ -72,7 +72,7 @@ class EventBinder
    * @param event_binding_groups 分组事件绑定配置
    */
   EventBinder(std::initializer_list<ModuleInfo> modules,
-              std::initializer_list<BindingGroup> event_binding_groups)
+              std::initializer_list<BindingGroup> event_binding_groups = {})
   {
     auto find_event = [&](const char* name) -> LibXR::Event*
     {
