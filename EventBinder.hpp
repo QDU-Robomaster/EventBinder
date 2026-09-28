@@ -102,10 +102,5 @@ class EventBinder
     }
   }
 
-  /**
-   * @brief 监控回调
-   */
-  void OnMonitor() {}
-
  private:
 };
