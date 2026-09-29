@@ -52,16 +52,6 @@ jobs:
 
       - name: Pull libxr to ./libxr
         run: git clone --depth=1 https://github.com/Jiu-xiao/libxr ./libxr
-      - name: Checkout DR16 module
-        uses: actions/checkout@v4
-        with:
-          repository: QDU-Robomaster/DR16
-          path: Modules/DR16
-      - name: Checkout CMD module
-        uses: actions/checkout@v4
-        with:
-          repository: QDU-Robomaster/CMD
-          path: Modules/CMD
       - name: Setup Python & Install deps
         run: |
           python3 -m pip install --upgrade pip
@@ -86,8 +76,6 @@ jobs:
       - name: Add BlinkLED module
         run: |
           xrobot_add_mod BlinkLED --instance-id BlinkLED_0
-          xrobot_add_mod CMD      --instance-id cmd
-          xrobot_add_mod DR16     --instance-id dr16
 
       - name: Add this repo module
         run: |
@@ -103,6 +91,13 @@ jobs:
           cd build
           cmake ..
           make
+
+      - name: Test event bindings
+        run: |
+          cmake -S Modules/${{ env.XR_MODULE_NAME }}/tests -B build-event-tests \
+            -DLIBXR_ROOT="$PWD/libxr"
+          cmake --build build-event-tests
+          ctest --test-dir build-event-tests --output-on-failure
 
       - name: Create Tag via GitHub API
         if: ${{ success() && github.event_name != 'pull_request' }}

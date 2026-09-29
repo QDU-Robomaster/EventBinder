@@ -1,85 +1,71 @@
 # EventBinder
 
-用于按配置把一个模块的事件映射到另一个模块事件的绑定模块。
+将两个事件端点连接起来：触发源事件时，同步触发目标事件。端点由
+`LibXR::Event&` 和事件 ID 组成，不要求事件来自模块，也不处理控制源或业务模式。
 
-它的目标是把“模块联动关系”从业务代码里抽离出来，避免硬编码耦合。
+## C++
 
-## 解决什么问题
+```cpp
+LibXR::Event input_events;
+LibXR::Event output_events;
 
-EventBinder 主要解决三件事：
+EventBinder binder({
+    {{input_events, 1}, {output_events, 2}},
+});
 
-1. 统一描述跨模块事件映射（源事件 -> 目标事件）。
-2. 支持一组模块、多组绑定关系集中管理。
-3. 降低模式切换联动时的模块耦合度。
-
-## 绑定模型
-
-EventBinder 通过两类配置完成绑定：
-
-1. `modules`：声明可参与绑定的模块事件入口。
-2. `event_binding_groups`：声明每条映射规则。
-
-每条映射规则包含：
-
-1. `source_module`：源模块名。
-2. `source_event`：源事件 ID。
-3. `target_module`：目标模块名。
-4. `target_event`：目标事件 ID。
-
-核心结构与方法：
-
-1. `ModuleInfo`：模块名 + `GetEvent()` 入口。
-2. `EventBinding`：单条事件映射。
-3. 构造函数：遍历配置并执行 `Bind(...)`。
-
-## 最小接入示例
-
-1. 添加模块：
-
-```bash
-xrobot_add_mod EventBinder --instance-id eventbinder
-xrobot_gen_main
+input_events.Active(1);  // 同步触发 output_events 的事件 2
 ```
 
-2. 典型配置（将 DR16 开关事件映射到 CMD 模式）：
+事件 ID 支持整数和枚举，内部转换为 `uint32_t`。枚举所属对象仍由调用方保证。
+源、目标 `Event` 必须在绑定生效期间一直存活。绑定注册后不会随 binder
+对象析构而解除。
+
+## XRobot YAML
 
 ```yaml
-module: EventBinder
-entry_header: Modules/EventBinder/EventBinder.hpp
-constructor_args:
-  - modules:
-    - name: "dr16"
-      module_ref: '@dr16'
-    - name: "cmd"
-      module_ref: '@cmd'
-  - event_binding_groups:
-    - bindings:
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_R_POS_MID
-        target_module: "cmd"
-        target_event: CMD::Mode::CMD_OP_CTRL
-      - source_module: "dr16"
-        source_event: DR16::SwitchPos::DR16_SW_R_POS_BOT
-        target_module: "cmd"
-        target_event: CMD::Mode::CMD_OP_CTRL
-template_args: []
+- id: event_binder
+  name: EventBinder
+  constructor_args:
+    bindings:
+    - source:
+        event: '@dr16.GetEvent()'
+        id: DR16::SwitchPos::DR16_SW_R_POS_MID
+      target:
+        event: '@cmd.GetEvent()'
+        id: CMD::Mode::CMD_OP_CTRL
 ```
 
-## 使用约定
+`@` 后的内容直接作为 C++ 表达式。`GetEvent()` 只是调用方取得事件对象的一种方式，
+绑定器本身不调用它，也不依赖 DR16 或 CMD。端点字段顺序使用 `event`、`id`，
+绑定字段顺序使用 `source`、`target`，与生成器输出的聚合初始化顺序一致。
+默认 `bindings: []`，无需硬件或其他模块。
 
-1. `modules` 中的 `name` 必须和 `event_binding_groups` 里引用完全一致。
-2. 源/目标模块都必须提供 `GetEvent()`。
-3. 事件 ID 推荐统一从枚举转换，避免裸数字。
-4. 先验证关键联动链路，再逐步增加绑定条目。
+## 配置约束
 
-## 模块信息
+模块不检查重复绑定或环路。重复绑定会让目标回调重复执行；自绑定或多级环路在
+事件触发时可能无限递归，直至栈溢出。配置者需要保证绑定关系无环。
+EventBinder 本身不使用动态数组；底层 `LibXR::Event::Bind()` 在初始化时
+为每条绑定分配记录。
 
-1. 代码入口：`Modules/EventBinder/EventBinder.hpp`
-2. Required Hardware：`dr16`
-3. Constructor Arguments：
-   - `modules`
-   - `event_binding_groups`
-4. Template Arguments：None
-5. Depends：
-   - `qdu-future/DR16`
-   - `qdu-future/CMD`
+## 执行上下文
+
+实际转发使用 `LibXR::Event::Bind()`，没有新线程或队列。目标回调在源事件的
+调用上下文中同步执行，并透传 `in_isr`。目标回调必须适合该上下文，尤其不能
+在 ISR 路径阻塞。分支回调的顺序沿用 LibXR，不由本模块保证。
+
+## 从旧配置迁移
+
+删除 `modules` 和 `event_binding_groups`，把各组按原顺序展开为 `bindings`。
+根据原模块别名对应的 `module_ref` 填入事件表达式，例如别名 `chassis` 对应
+`@helm_chassis`，新端点使用 `@helm_chassis.GetEvent()`。保留原事件 ID 和边的顺序。
+
+## 测试
+
+使用模块内 `tests/CMakeLists.txt`，传入本地 LibXR 源码目录：
+
+```sh
+cmake -S Modules/EventBinder/tests -B build/event-binder-tests \
+  -DLIBXR_ROOT="$PWD/Middlewares/Third_Party/LibXR"
+cmake --build build/event-binder-tests
+ctest --test-dir build/event-binder-tests --output-on-failure
+```
