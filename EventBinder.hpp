@@ -2,7 +2,7 @@
 
 // clang-format off
 /* === MODULE MANIFEST V2 ===
-module_description: 事件绑定模块，支持通过构造函数参数配置事件绑定关系
+module_description: 事件绑定模块：按构造参数把一个模块的事件映射到另一个模块的事件 / Event binding Module that maps the events of one Module to the events of another according to its constructor parameters
 depends:
 - id: QDU-Robomaster/DR16
   ref: same-or-dev
