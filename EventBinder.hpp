@@ -12,6 +12,7 @@ depends:
 // clang-format on
 
 #include <cstdint>
+#include <cstring>
 #include <initializer_list>
 
 #include "CMD.hpp"
